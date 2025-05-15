@@ -12,24 +12,29 @@
 (defn safe-parse-double [^String str-double]
   (try (Double/parseDouble str-double) (catch Exception _ str-double)))
 
-(-> (t/parse-date "01-Jan-84" (t/formatter "dd-MMM-yy"))
-    (t/date)
-    (str))
+(defn count-hyphens [date-string]
+  (count (apply str (re-seq #"-" date-string))))
+(count-hyphens "01-Jan-84")
 
 (defn parse-year
-  "handling year with only 2 ending digits"
+  "handling year with only 2 ending digits 
+
+parameter: date-string : String e.g. '01-Jan-84'
+ 
+return: ISO 8601 e.g.: '1984-01-01'
+   "
   [date-string]
-  (println date-string)
-  (let  [[day month yr] (str/split date-string #"-")
-         full-year (if (> (parse-long yr) 50)
-                     (str "19" yr)
-                     (str "20" yr))
-         parsed-date (str day "-" month "-" full-year)]
-    (str (t/parse-date parsed-date (t/formatter "dd-MMM-yyyy" (java.util.Locale. "en_US") )))))
+  ;; check if the hyphen counts is 2,
+  ;; if not 2 return input
+  ;; else process the date
+  (if (not (= 2 (count-hyphens date-string))) date-string
+      (let  [[day month yr] (str/split date-string #"-")
+             full-year (if (> (parse-long yr) 50)
+                         (str "19" yr)
+                         (str "20" yr))
+             parsed-date (str day "-" month "-" full-year)]
+        (str (t/parse-date parsed-date (t/formatter "dd-MMM-yyyy" (java.util.Locale. "en_US")))))))
 (parse-year "30-Sep-84")
-
-(t/parse-date "30-Sept-1986" (t/formatter "dd-MMM-yyyy"))
-
 
 (defn parse-milk
   "Parsing into a Milk object from the CSV header column names."
@@ -37,10 +42,8 @@
   (Milk.
    sample
    type
-    (parse-year start-date)
-    (parse-year stop-date)
-  ;;  start-date
-  ;;  stop-date
+   (parse-year start-date)
+   (parse-year stop-date)
    station
    provence
    (safe-parse-double sr90-activity)
