@@ -25,7 +25,7 @@
                      (str "19" yr)
                      (str "20" yr))
          parsed-date (str day "-" month "-" full-year)]
-    (str (t/parse-date parsed-date (t/formatter "dd-MMM-yyyy")))))
+    (str (t/parse-date parsed-date (t/formatter "dd-MMM-yyyy" (java.util.Locale. "en_US") )))))
 (parse-year "30-Sep-84")
 
 (t/parse-date "30-Sept-1986" (t/formatter "dd-MMM-yyyy"))
