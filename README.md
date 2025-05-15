@@ -1,12 +1,12 @@
 # clojure_research
 
-Facts about clojure:
+Facts about Clojure:
 1. A LISP dialect.
-2. A functional programming language focus on immutability.
+2. A functional programming language focuses on immutability.
 3. Design for Concurrency
 4. Symbiotic with an established Platform
 
-Clojure lives on top of different VMs and host languages with the syntax is minimalistic, Clojure focus on solving problems.
+Clojure lives on top of different VMs and host languages, with minimalistic syntax. Clojure focuses on solving problems.
 
 ## How to start?
 We can follow the [official guide](https://clojure.org/guides/install_clojure)
@@ -14,7 +14,7 @@ We can follow the [official guide](https://clojure.org/guides/install_clojure)
 for macOS:
 `brew install clojure/tools/clojure`
 
-for linux:
+For Linux:
 ```sh
 curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
 chmod +x linux-install.sh
@@ -22,12 +22,12 @@ sudo ./linux-install.sh
 ```
 
 for Windows:
-use the WSL2 and install withe linux commands.
+Use WSL2 and install with Linux commands.
 
-Make sure you have on the system.
+Make sure you have it on the system.
 
-easier way for macOS, linux, and windows WSL2:
-install SDKMAN JDK version manager.
+An easier way for macOS, Linux, and Windows WSL2:
+Install the SDKMAN JDK version manager.
 `curl -s "https://get.sdkman.io" | bash`
 
 or for macOS:
@@ -37,7 +37,7 @@ brew install --cask temurin@21
 echo 'export PATH="/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home/bin:$PATH"' >> ~/.zshrc
 ```
 
-To test if you have successfully installed Clojure in the terminal type: 
+To test if you have successfully installed Clojure in the terminal, type: 
 `clj`
 
 # Table of Contents
