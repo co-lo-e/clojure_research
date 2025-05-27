@@ -115,18 +115,15 @@ Example:
    (fn [milk]
      (every?
       (fn [[k v]]
-        (let [target-value (get milk k)
-              allowed (set (keys milk))]
-          (if-not (contains?  allowed k)
-            '()
+        (let [target-value (get milk k)]
             (cond
               (string? target-value) (ele-include? target-value v)
               (number? target-value) (= target-value v)
-              :else (= target-value v)))))
+              :else (= target-value v))))
       query-map))
    milk-data))
 
-(find-milk {:province "ON" :type "WHOLE" :start-date "1992" :stop-date "1992", :pig 1})
+(find-milk {:province "ON" :type "WHOLE" :start-date "1992" :stop-date "1992"})
 
 (defn insert-milk [ new-milk]
   ())
