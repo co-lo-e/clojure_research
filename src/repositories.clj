@@ -11,20 +11,6 @@
   (update-data [query item])
   (delete-data [id]))
 
-(defn load-milk-data []
-  (try (map parse-milk (load-data  "resources/nms_strontium90_milk_ssn_strontium90_lait.csv"))
-       (catch Exception _ (log/warn "Failed to find the file, is the filename correct?"))))
-
-(def milk-data
-  (load-milk-data))
-
-milk-data
-
-(defn list-all
-  "List all the milk data"
-  []
-  milk-data)
-
 
 (defn ele-include?
   "
@@ -66,9 +52,6 @@ if the k-val is nil or non Double it will be nil or false respectively.
       (and (>= k-val min) (<= k-val max))
       false)))
 
-(ele-between? 0.1 0 nil)
-
-
 (defn filter-between
   "[vmap q-keyword min max]
 
@@ -96,7 +79,23 @@ Example:
       (do (log/warn "Keyword" q-keyword "is not valid please use" allowed) '()))))
 
 
-(filter-between milk-data :sr90-activity 0.006 0.1)
+#_(filter-between milk-data :sr90-activity 0.006 0.1)
+
+;; ======================================================================= ;;
+;;                          Repositories
+;; ======================================================================= ;;
+
+(defn load-milk-data []
+  (try (map parse-milk (load-data  "resources/nms_strontium90_milk_ssn_strontium90_lait.csv"))
+       (catch Exception _ (log/warn "Failed to find the file, is the filename correct?"))))
+
+(def milk-data
+  (load-milk-data))
+
+(defn list-all
+  "List all the milk data"
+  []
+  milk-data)
 
 (defn find-milk
   "query-map: accept a map with defrecord Milk keywords with query value
@@ -128,3 +127,12 @@ Example:
    milk-data))
 
 (find-milk {:province "ON" :type "WHOLE" :start-date "1992" :stop-date "1992", :pig 1})
+
+(defn insert-milk [ new-milk]
+  ())
+
+(defn update-milk [ new-milk]
+  ())
+
+(defn delete-milk [ milk ]
+  ())
