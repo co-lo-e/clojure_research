@@ -89,7 +89,9 @@ Example:
     (if  (contains? allowed q-keyword)
       (filter
        (fn [map] (let [value (get map q-keyword)]
-                   (if-not (nil? value) (and (>= value min) (<= value max)) nil)))
+                   (if-not (nil? value)
+                     (and (>= value min) (<= value max))
+                     nil)))
        vmap)
       (do (log/warn "Keyword" q-keyword "is not valid please use" allowed) '()))))
 
@@ -97,19 +99,32 @@ Example:
 (filter-between milk-data :sr90-activity 0.006 0.1)
 
 (defn find-milk
-  "[q-keyword q-value]
+  "query-map: accept a map with defrecord Milk keywords with query value
  
- q-keyword: the query keyword from the Milk defrecord e.g., :station :start-date, :province
- q-value: 
+ case insensitive for string query value,
+ 
+ double values has be to exact
+
+ return: zero or more sequence of defrecord Milk
+ Example
+ ```clj
+ (find-milk {:station \"CALGARY\" :type \"RAW\"})
+ ```
  "
-  [q-keyword q-value]
+  [query-map]
   (filter
    (fn [milk]
-     (let [k-val (get milk q-keyword)]
-       (if (string? k-val)
-         (ele-include? k-val q-value)
-         (ele-between? k-val 0 q-value))))
+     (every?
+      (fn [[k v]]
+        (let [target-value (get milk k)
+              allowed (set (keys milk))]
+          (if-not (contains?  allowed k)
+            '()
+            (cond
+              (string? target-value) (ele-include? target-value v)
+              (number? target-value) (= target-value v)
+              :else (= target-value v)))))
+      query-map))
    milk-data))
 
-#_(find-milk :station "CALGARY")
-#_(find-milk :sr90-activity  "a")
+(find-milk {:province "ON" :type "WHOLE" :start-date "1992" :stop-date "1992", :pig 1})
