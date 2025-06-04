@@ -63,3 +63,8 @@ To test if you have successfully installed Clojure in the terminal, type:
   - [x] xi. Comment on beginning of the file with course, student, and professor name, each header, constants, and methods
 	
 ## Project 2<a name="project-2-"></a>
+
+- WBS:
+  - [] i: convert to a web app
+  - [] ii: CRUD with the in-memory data
+  - [] iii: write csv with either UUID file name or custom name.
