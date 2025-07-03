@@ -1,9 +1,8 @@
 (ns data-reader
-  (:require [clojure.java.io :as io]
-            [clojure.data.csv :as csv]
-            [clojure.tools.logging :as log]))
-
-(slurp "resources/nms_strontium90_milk_ssn_strontium90_lait.csv")
+  (:require
+   [clojure.data.csv :as csv]
+   [clojure.java.io :as io]
+   [clojure.tools.logging :as log]))
 
 (defn safe-parse-double [s]
   (try
@@ -20,6 +19,7 @@
       (mapv (fn [row]
               (let [m (zipmap keywords row)] ;; zip keyword with cell
                 (-> m
+                    (assoc :id (java.util.UUID/randomUUID))
                     (assoc :sr90-activity (safe-parse-double (:sr90-activity m)))
                     (assoc :sr90-error (safe-parse-double (:sr90-error m)))
                     (assoc :sr90-calcium (safe-parse-double (:sr90-calcium m)))))) rows))))
@@ -36,7 +36,7 @@ milk-data
        (map :station)
        distinct
        sort))
-provinces
-stations
+#_provinces
+#_stations
 
-(frequencies (map #(:station %) milk-data))
+#_(frequencies (map #(:station %) milk-data))

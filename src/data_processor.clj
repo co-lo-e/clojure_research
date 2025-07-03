@@ -13,9 +13,9 @@
 (defn text-blue [text]
   (str "\u001b[34m" text "\u001b[0m"))
 
-(defn ctext [ text colour]
+(defn ctext [text colour]
   (cond colour
-        (= colour :blue) ))
+        (= colour :blue)))
 
 (defn safe-parse-double
   "String to double parser, when failed to parse return empty string
@@ -104,9 +104,6 @@ return: ISO 8601 e.g.: '1984-01-01'
   (with-open [reader (io/reader filename)]
     (rest (doall
            (csv/read-csv reader)))))
-
-
-
 
 ;; retired.
 (defn- read-csv

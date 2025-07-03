@@ -2,14 +2,15 @@
   (:require
    [clojure.string :as str]
    [clojure.tools.logging :as log]
-   [data-processor :refer :all]))
+   [data-processor :refer :all]
+   [data-reader :refer [milk-data]]))
 
 (defprotocol repositories
-  (list-all [])
-  (find-by [query])
-  (create-data [item])
-  (update-data [query item])
-  (delete-data [id]))
+  (list-all [this])
+  (find-by [this query])
+  (create-data [this item])
+  (update-data [this query item])
+  (delete-data [this id]))
 
 
 (defn ele-include?
@@ -89,13 +90,14 @@ Example:
   (try (map parse-milk (load-data  "resources/nms_strontium90_milk_ssn_strontium90_lait.csv"))
        (catch Exception _ (log/warn "Failed to find the file, is the filename correct?"))))
 
-(def milk-data
-  (load-milk-data))
+(def milk-data*
+  (atom  milk-data))
 
 (defn list-all
   "List all the milk data"
   []
-  milk-data)
+  @milk-data*)
+#_(list-all)
 
 (defn find-milk
   "query-map: accept a map with defrecord Milk keywords with query value
@@ -116,20 +118,63 @@ Example:
      (every?
       (fn [[k v]]
         (let [target-value (get milk k)]
-            (cond
-              (string? target-value) (ele-include? target-value v)
-              (number? target-value) (= target-value v)
-              :else (= target-value v))))
+          (cond
+            (string? target-value) (ele-include? target-value v)
+            (number? target-value) (= target-value v)
+            :else (= target-value v))))
       query-map))
-   milk-data))
+   @milk-data*))
+
+
+(defn uuid-parser [id]
+  (try
+    (let [uuid-obj
+          (cond
+            (uuid? id) id
+            (string? id) (java.util.UUID/fromString id)
+            (nil? id) (throw (ex-info "cannot be nil" {:provided id}))
+            :else (throw (ex-info "must be string or uuid" {:provided id :type (type id)})))]
+      uuid-obj)
+    (catch IllegalArgumentException e (log/error (str "Invalid: " (.getMessage e))))))
+
+(defn find-milk-by-id
+  "Find by uuid, when passing the value to the argument use 
+ #uuid before the value.
+ 
+ example:
+ ```clj
+(find-milk-by-d #uuid \"f3j1941290-i1120-3i1\") 
+ ```"
+  [id]
+  (let [uuid-obj (uuid-parser id)]
+     (first (filter
+                 (fn [milk] (= (:id milk) uuid-obj)) @milk-data*))))
+
+#_(find-milk-by-id #uuid "e4e330e5-ce1c-4e7a-873b-e5919a764bc8")
+#_(find-milk-by-id "e4e330e5-ce1c-4e7a-873b-e5919a764bc8")
 
 (find-milk {:province "ON" :type "WHOLE" :start-date "1992" :stop-date "1992"})
 
-(defn insert-milk [ new-milk]
-  ())
+(defn insert-milk
+  "Insert a new milk record"
+  [new-milk]
+  (swap! milk-data* conj new-milk))
 
-(defn update-milk [ new-milk]
-  ())
+(defn update-milk
+  "Updating a milk record by id"
+  [id new-milk]
+  (let[ uuid (uuid-parser id )]
+  (swap! milk-data*
+         (fn [milk]
+           (map #(if (= (:id %) uuid)
+                   new-milk
+                   %)
+                milk)))))
 
-(defn delete-milk [ milk ]
-  ())
+(defn delete-milk
+  "Removing a milk record by id"
+  [id]
+  (let [uuid (uuid-parser id )]
+  (swap! milk-data*
+         (fn [milk]
+           (remove #(= (:id %) uuid) milk)))))
