@@ -1,11 +1,27 @@
-(ns data-processor
+(ns research.utils
   (:require
-   [clojure.data.csv :as csv]
-   [clojure.java.io :as io]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
-   [models]
    [tick.core :as t]))
+
+(defn uuid-parser [id]
+  (try
+    (let [uuid-obj
+          (cond
+            (uuid? id) id
+            (string? id) (java.util.UUID/fromString id)
+            (nil? id) (throw (ex-info "cannot be nil" {:provided id}))
+            :else (throw (ex-info "must be string or uuid" {:provided id :type (type id)})))]
+      uuid-obj)
+    (catch IllegalArgumentException e (log/error (str "Invalid: " (.getMessage e))))))
+
+;; (defn safe-parse-double [s]
+;;   (try
+;;     (Double/parseDouble s)
+;;     (catch Exception e
+;;       (log/warn (str "Could not parse '" s "' as double: " (.getMessage e)))
+;;       nil)))
+
 
 (defn text-red [text]
   (str "\u001b[31m" text "\u001b[0m"))
@@ -30,10 +46,13 @@
                (catch Exception _
                  (log/warn  "Failed to parse string to double,\n[WHY] check your input must be" (text-red "Double in String") "but your input" (text-blue str-double) "is not Double in String")
                  nil))))
+
+
 #_(safe-parse-double "")
 #_(safe-parse-double "abc")
 #_(safe-parse-double "1.2")
 #_(safe-parse-double "23.4E-9")
+
 
 (defn- count-hyphens
   "Accepting date in string with dd-MMM-yy format,
@@ -56,7 +75,7 @@ returns - count: int
 #_(count-hyphens "01Jan84")
 #_(count-hyphens "01Jan84---")
 
-(defn- parse-year
+(defn parse-year
   "handling year with only 2 ending digits 
 
 parameter: date-string : String e.g. '01-Jan-84'
@@ -84,41 +103,3 @@ return: ISO 8601 e.g.: '1984-01-01'
       (str (t/parse-date parsed-date (t/formatter "dd-MMM-yyyy" (java.util.Locale. "en_US")))))))
 #_(parse-year "01-Jan-84")
 #_(parse-year "01-Jan84")
-
-
-(defn parse-milk
-  "Parsing into a Milk object from the CSV header column names."
-  [[sample type start-date stop-date station provence sr90-activity sr90-error sr90-calcium]]
-  (models/->Milk
-   sample
-   type
-   (parse-year start-date)
-   (parse-year stop-date)
-   station
-   provence
-   (safe-parse-double sr90-activity)
-   (safe-parse-double sr90-error)
-   (safe-parse-double sr90-calcium)))
-
-(defn load-data [filename]
-  (with-open [reader (io/reader filename)]
-    (rest (doall
-           (csv/read-csv reader)))))
-
-;; retired.
-(defn- read-csv
-  "Reading csv from resources directory
-
-  parameters -  filename: String with .csv
-  
-  returns - rows of csv except header.
-   "
-  [^String filename]
-  (let [raw (slurp (str "resources/" filename))
-        ;; thread-first macro, pass "raw" to the first position in the argument.
-        lines (-> raw
-                  (str/replace #"\r" "")
-                  (str/split #"\n"))
-        rows (map #(str/split % #",") lines)]
-    ;; skip header 
-    (rest rows)))

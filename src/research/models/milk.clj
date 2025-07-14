@@ -1,4 +1,4 @@
-(ns models)
+(ns research.models.milk)
 
 
 ;; A record representation of CSV header column names

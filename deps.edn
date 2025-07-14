@@ -2,7 +2,7 @@
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
         org.clojure/data.csv {:mvn/version "1.1.0"}
         tick/tick {:mvn/version "1.0"}
-          ;; HTTP server
+        ;; HTTP server
         ring/ring {:mvn/version "1.13.0"}
         ;; Routing
         metosin/reitit-ring {:mvn/version "0.7.2"}
@@ -13,9 +13,9 @@
         ;; HTML Generation
         hiccup/hiccup {:mvn/version "2.0.0-RC3"}
         ;; JSON Reading and Writing
-        cheshire/cheshire {:mvn/version "5.13.0"}
-        }
- :aliases {:test {:extra-paths ["test"]
+        cheshire/cheshire {:mvn/version "5.13.0"}}
+ :aliases { :dev {:extra-paths ["dev"]}
+           :test {:extra-paths ["test"]
                   :extra-deps {io.github.cognitect-labs/test-runner
                                {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
                   :main-opts ["-m" "cognitect.test-runner"]

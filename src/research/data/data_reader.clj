@@ -1,15 +1,8 @@
-(ns data-reader
+(ns research.data.data-reader
   (:require
    [clojure.data.csv :as csv]
    [clojure.java.io :as io]
-   [clojure.tools.logging :as log]))
-
-(defn safe-parse-double [s]
-  (try
-    (Double/parseDouble s)
-    (catch Exception e
-      (log/warn (str "Could not parse '" s "' as double: " (.getMessage e)))
-      nil)))
+   [research.utils :refer [safe-parse-double]]))
 
 (def milk-data
   (with-open [rdr (io/reader "resources/nms_strontium90_milk_ssn_strontium90_lait.csv")]

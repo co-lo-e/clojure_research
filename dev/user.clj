@@ -1,3 +1,23 @@
-(ns user)
+(ns user
+  (:require
+   [research.system :as system]))
 
-;; TODO: setup with system for dev mode in REPL.
+(def system nil)
+
+(defn start-system! []
+  (if system
+    (println "Address in use.")
+    (alter-var-root #'system (constantly (system/start-system)))))
+
+
+(defn stop-system! []
+  (when system
+    (system/stop-system system)
+    (alter-var-root #'system (constantly nil))))
+
+(defn restart-system! []
+  (stop-system!)
+ 	(start-system!))
+
+(defn server []
+  (::system/server system))

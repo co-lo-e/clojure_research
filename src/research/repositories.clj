@@ -1,9 +1,10 @@
-(ns repositories
+(ns research.repositories
   (:require
    [clojure.string :as str]
    [clojure.tools.logging :as log]
-   [data-processor :refer :all]
-   [data-reader :refer [milk-data]]))
+   [research.data.data-processor :refer :all]
+   [research.data.data-reader :as d]
+   [research.utils :refer [uuid-parser]]))
 
 (defprotocol repositories
   (list-all [this])
@@ -80,7 +81,7 @@ Example:
       (do (log/warn "Keyword" q-keyword "is not valid please use" allowed) '()))))
 
 
-#_(filter-between milk-data :sr90-activity 0.006 0.1)
+#_(filter-between d/milk-data :sr90-activity 0.006 0.1)
 
 ;; ======================================================================= ;;
 ;;                          Repositories
@@ -91,7 +92,7 @@ Example:
        (catch Exception _ (log/warn "Failed to find the file, is the filename correct?"))))
 
 (def milk-data*
-  (atom  milk-data))
+  (atom  d/milk-data))
 
 (defn list-all
   "List all the milk data"
@@ -124,18 +125,9 @@ Example:
             :else (= target-value v))))
       query-map))
    @milk-data*))
+#_(find-milk {:province "ON" :type "WHOLE" :start-date "1992" :stop-date "1992"})
 
 
-(defn uuid-parser [id]
-  (try
-    (let [uuid-obj
-          (cond
-            (uuid? id) id
-            (string? id) (java.util.UUID/fromString id)
-            (nil? id) (throw (ex-info "cannot be nil" {:provided id}))
-            :else (throw (ex-info "must be string or uuid" {:provided id :type (type id)})))]
-      uuid-obj)
-    (catch IllegalArgumentException e (log/error (str "Invalid: " (.getMessage e))))))
 
 (defn find-milk-by-id
   "Find by uuid, when passing the value to the argument use 
@@ -153,7 +145,6 @@ Example:
 #_(find-milk-by-id #uuid "e4e330e5-ce1c-4e7a-873b-e5919a764bc8")
 #_(find-milk-by-id "e4e330e5-ce1c-4e7a-873b-e5919a764bc8")
 
-(find-milk {:province "ON" :type "WHOLE" :start-date "1992" :stop-date "1992"})
 
 (defn insert-milk
   "Insert a new milk record"

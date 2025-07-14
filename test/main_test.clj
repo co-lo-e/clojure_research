@@ -1,7 +1,9 @@
 (ns main-test
 (:use clojure.test)
   (:require
-   [main :refer :all]))
+   [research.data-processor :refer [parse-milk]]
+   [research.main :refer :all]
+   [research.utils :refer :all]))
 
 (deftest test-parse-milk
   (testing "Parsing a valid milk record"
