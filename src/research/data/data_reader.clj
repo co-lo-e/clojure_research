@@ -17,7 +17,6 @@
                     (assoc :sr90-error (safe-parse-double (:sr90-error m)))
                     (assoc :sr90-calcium (safe-parse-double (:sr90-calcium m)))))) rows))))
 
-milk-data
 (def provinces
   (->> milk-data
        (map :province)

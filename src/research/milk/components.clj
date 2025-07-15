@@ -1,6 +1,23 @@
 (ns research.milk.components
   (:require
+   [hiccup2.core :as h]
    [research.data.data-reader :refer [milk-data]]))
+
+(defn head [title]
+  [:head
+   [:title title]
+   [:link {:rel "stylesheet"
+           :href "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"}]])
+
+(defn page-body [title h1 body-f-comp]
+  (str
+   (h/html
+    [:html
+     (head title)
+     [:body
+      [:div {:class "container mt-4"}
+       [:h1 h1]
+       body-f-comp]]])))
 
 (defn milk-table []
   [:table {:class "table table-striped"}

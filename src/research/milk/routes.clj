@@ -1,27 +1,30 @@
 (ns research.milk.routes
   (:require
    [cheshire.core :as ches]
-   [hiccup2.core :as h]
-   [research.data.data-reader :refer [milk-data]]))
+   [research.data.data-reader :refer [milk-data]]
+   [research.milk.components :refer [milk-table page-body]]))
+
 (defn list-handler [system _request]
-  {:status 200
-   :headers {"Content-Type" "text/html"}
-   :body (str
-          (h/html
-           [:html
-            [:head
-             [:title "Milk Records"]
-             [:link {:rel "stylesheet"
-                     :href "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"}]]
-            [:body
-             [:div {:class "container mt-4"}
-              [:h1 "Milk Records"]
-              (milk-table)]]]))})
+  (try
+    {:status 200
+     :headers {"Content-Type" "text/html"}
+     :body (page-body "Clojure Research" "Milk Records" milk-table)}
+    (catch Exception e
+      (println (.getMessage e))
+      {:status 500
+       :headers {"Content-Type" "text/html"}
+       :body (page-body "Clojure Research" "Milk Records" [:h1 "Internal Server Error."])})))
 
 (defn get-milk-records-handler [system _request]
-  {:status 200
-   :headers {"Content-Type" "application/json"}
-   :body (ches/generate-string milk-data)})
+  (try
+    {:status 200
+     :headers {"Content-Type" "application/json"}
+     :body (ches/generate-string milk-data)}
+    (catch Exception e
+      (println (.getMessage e))
+      {:status  500
+       :headers {"Content-Type" "application/json"}
+       :body (ches/generate-string {:message (.getMessage e)})})))
 
 (defn routes [system]
   [["/milk-records" {:get {:handler (partial #'list-handler system)}}]
